@@ -1,0 +1,5 @@
+# Ignore go sum file
+go.sum
+
+# Ignore the result of main.go
+articles.csv
