@@ -1,3 +1,6 @@
+# Ignore python virtual environment
+env
+
 # Ignore go sum file
 go.sum
 
