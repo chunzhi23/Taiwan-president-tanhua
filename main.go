@@ -20,13 +20,13 @@ type article struct {
 }
 
 func main() {
-	defer os.Remove("articles.csv")
+	defer os.Remove("data/articles.csv")
 	articles := scrapData()
 	writeArticles(articles)
 }
 
 func writeArticles(articles []article) {
-	file, err := os.Create("articles.csv")
+	file, err := os.Create("data/articles.csv")
 	checkError(err)
 
 	w := csv.NewWriter(file)
