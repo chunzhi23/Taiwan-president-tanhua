@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="wrap">
+        <h2>台灣總統談話報廢網頁</h2>
+        <ul></ul>
+    </div>
+    <script>
+        let articleData;
+        async function getArticles(){
+            await fetch("/api/articles")
+            .then(response => response.json())
+            .then(data => {
+                articleData = data;
+            });
+            
+            const olWrap = document.querySelector("#wrap > ul");
+            for (let i = 0; i < articleData.length; i++){
+                let newLi = document.createElement("li");
+                let newA = document.createElement("a");
+                newA.innerText = articleData[i]["date"];
+                newA.href = articleData[i]["url"];
+                newA.target = '_blank'
+                newLi.appendChild(newA);
+                olWrap.appendChild(newLi);
+            }
+        } getArticles();
+    </script>
+</body>
+</html>
