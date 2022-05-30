@@ -6,10 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+<style>
+    li {line-height: 24px;}
+</style>
 <body>
     <div id="wrap">
-        <h2>台灣總統談話報廢網頁</h2>
-        <ul></ul>
+        <h2>台灣國總統談話</h2>
+        <ol id="gridCards"></ol>
     </div>
     <script>
         let articleData;
@@ -20,13 +23,12 @@
                 articleData = data;
             });
             
-            const olWrap = document.querySelector("#wrap > ul");
+            const olWrap = document.querySelector("#wrap > ol");
             for (let i = 0; i < articleData.length; i++){
                 let newLi = document.createElement("li");
                 let newA = document.createElement("a");
-                newA.innerText = articleData[i]["date"];
+                newA.innerText = articleData[i]["title"];
                 newA.href = articleData[i]["url"];
-                newA.target = '_blank'
                 newLi.appendChild(newA);
                 olWrap.appendChild(newLi);
             }
