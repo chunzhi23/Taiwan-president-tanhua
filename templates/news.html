@@ -6,7 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+<style>
+    #wrap {
+        margin-left: 50px;
+        margin-top: 30px;
+    }
+    #container {width: 800px;}
+    b {font-size: 18px;}
+</style>
 <body>
+    <div id="wrap">
+        <h2>{{ title }}</h2>
+        <div id="container"></div>
+    </div>
     <script>
         let detailData;
         async function getDetails(){
@@ -16,8 +28,24 @@
             .then(response => response.json())
             .then(data => {
                 detailData = data;
-                console.log(data.content)
+                console.log(data)
             });
+
+            let container = document.getElementById("container");
+            let newB = document.createElement("b");
+            newB.innerText = detailData['subtitle'];
+            container.appendChild(newB);
+
+            let newDate = document.createElement("p");
+            newDate.innerText = detailData['date'];
+            container.appendChild(newDate);
+
+            let pgSplit = detailData['content'].split(/\r?\n/);
+            for (let i = 0; i < pgSplit.length; i++){
+                let newP = document.createElement("p");
+                newP.innerText = pgSplit[i];
+                container.appendChild(newP);
+            }
         } getDetails();
     </script>
 </body>

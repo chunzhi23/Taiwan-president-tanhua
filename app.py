@@ -14,7 +14,9 @@ def index():
 
 @app.route('/NEWS/<int:id>')
 def news(id):
-    return render_template('news.html')
+    df = pd.read_csv('data/articles.csv')
+    title = df[df['url'] == f'/NEWS/{id}']['title'].item()
+    return render_template('news.html', title=title)
 
 @app.route('/api/articles', methods=['GET'])
 def get_articles():
@@ -36,12 +38,12 @@ def get_details():
     tb = soup.select('#wrapper > section > div > div.words > div.president > div > div.col-sm-8')[0]
     divs = tb.find_all('div', recursive=False)
     subtitle = divs[0].get_text().strip()
-    date = divs[1].get_text().strip()
+    date = divs[1].find('span', {'class': 'date_green'}).get_text().strip()
     
     content = ''
-    ps = tb.find_all('p')
+    ps = tb.find('p', recursive=False)
     for p in ps:
-        content += p.get_text().strip()
+        content += '\n'+ p.get_text().strip()
 
     return json.dumps({
         'subtitle': subtitle,
