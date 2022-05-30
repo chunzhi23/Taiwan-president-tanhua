@@ -105,7 +105,7 @@ func focusCard(s *goquery.Selection, c chan article) {
 				title:   title,
 				date:    date,
 				summary: summary,
-				url:     "https://www.president.gov.tw/" + url,
+				url:     url,
 			}
 		}
 	})
