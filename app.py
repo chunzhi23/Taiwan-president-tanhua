@@ -1,6 +1,7 @@
 import json, requests
 import natsort
 import subprocess
+import jieba
 import pandas as pd
 
 from flask import Flask, render_template, request
@@ -43,7 +44,8 @@ def get_details():
     content = ''
     ps = tb.find('p', recursive=False)
     for p in ps:
-        content += '\n'+ p.get_text().strip()
+        seg_list = jieba.cut(p.get_text().strip())
+        content += '\n'+ '/'.join(seg_list)
 
     return json.dumps({
         'subtitle': subtitle,
