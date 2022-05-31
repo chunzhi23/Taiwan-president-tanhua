@@ -42,9 +42,10 @@ def get_details():
     date = divs[1].find('span', {'class': 'date_green'}).get_text().strip()
     
     content = ''
+    jieba.load_userdict('data/dict.txt')
     ps = tb.find('p', recursive=False)
     for p in ps:
-        seg_list = jieba.cut(p.get_text().strip())
+        seg_list = jieba.cut_for_search(p.get_text().strip())
         content += '\n'+ '/'.join(seg_list)
 
     return json.dumps({
