@@ -7,12 +7,25 @@
     <title>Document</title>
 </head>
 <style>
+    @keyframes bgcolor {
+        from {
+            background-color: rgba(0, 255, 0, 0.5);
+        }
+        to {
+            background-color: rgba(0, 255, 0, 0.5);
+        }
+    }
+
+    b {font-size: 18px;}
+    span:hover {
+        animation: bgcolor 1s infinite .2s;
+    }
+
     #wrap {
         margin-left: 50px;
         margin-top: 30px;
     }
     #container {width: 800px;}
-    b {font-size: 18px;}
 </style>
 <body>
     <div id="wrap">
@@ -20,6 +33,7 @@
         <div id="container"></div>
     </div>
     <script>
+        const regex = /[ $&+,:;=?@#|'<>.^*()%!\-，！？；：（）［］【】。「」﹁﹂"、·《》〈〉〔〕〖〗〘〙〚〛﹏…——～　_﹏A-Za-z0-9]/;
         let detailData;
         async function getDetails(){
             let urlArray = window.location.href.split("/");
@@ -28,7 +42,6 @@
             .then(response => response.json())
             .then(data => {
                 detailData = data;
-                console.log(data)
             });
 
             let container = document.getElementById("container");
@@ -43,7 +56,16 @@
             let pgSplit = detailData['content'].split(/\r?\n/);
             for (let i = 0; i < pgSplit.length; i++){
                 let newP = document.createElement("p");
-                newP.innerText = pgSplit[i];
+                let seg_list = pgSplit[i].split("/");
+                for (let j = 0; j < seg_list.length; j++){
+                    if (regex.exec(seg_list[j]) != null || seg_list[j] == ''){
+                        newP.innerHTML += seg_list[j];
+                    } else {
+                        let newSpan = document.createElement("span");
+                        newSpan.innerText = seg_list[j];
+                        newP.appendChild(newSpan);
+                    }
+                }
                 container.appendChild(newP);
             }
         } getDetails();
