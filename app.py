@@ -1,7 +1,9 @@
+import re
 import json, requests
 import natsort
 import subprocess
 import jieba
+import chinese_converter as ccvt
 import pandas as pd
 
 from flask import Flask, render_template, request
@@ -56,6 +58,40 @@ def get_details():
         'date': date,
         'content': content
     }, ensure_ascii=False)
+
+@app.route('/api/zhko/word', methods=['GET'])
+def get_zhko_word():
+    query = request.args.get('query')
+    query_simplified = ccvt.to_simplified(query)
+    
+    url = 'https://zh.dict.naver.com/api3/zhko/search?query=%s' % query_simplified
+
+    req = requests.get(url, headers={'user-agent': 'Chrome/101.0.4951.67'})
+    data = json.loads(req.text)
+    focus_data = data['searchResultMap']['searchResultListMap']['WORD']['items'][0]
+
+    ret_source = focus_data['sourceDictnameKO']
+    
+    ret_means = list()
+    for mean in focus_data['meansCollector']:
+        word_speech = mean['partOfSpeech']
+        
+        val_list = list()
+        for core in mean['means']:
+            sub_val = core['value']
+            val_list.append(sub_val)
+        
+        word_mean = dict({
+            'speech': word_speech,
+            'value': val_list})
+        
+        ret_means.append(word_mean)
+    
+    ret_flag = dict({
+        'source': ret_source,
+        'data': ret_means})
+
+    return json.dumps(ret_flag, ensure_ascii=False)
 
 if __name__ == '__main__':
     app.run(debug=True)
