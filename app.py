@@ -38,8 +38,11 @@ def get_details():
 
     tb = soup.select('#wrapper > section > div > div.words > div.president > div > div.col-sm-8')[0]
     divs = tb.find_all('div', recursive=False)
-    subtitle = divs[0].get_text().strip()
-    date = divs[1].find('span', {'class': 'date_green'}).get_text().strip()
+    subtitle_raw = divs[0].get_text().strip()
+    subtitle = '/'.join(jieba.cut(subtitle_raw, cut_all=False))
+
+    date_raw = divs[1].find('span', {'class': 'date_green'}).get_text().strip()
+    date = '/'.join(jieba.cut(date_raw, cut_all=False))
     
     content = ''
     jieba.load_userdict('data/dict.txt')

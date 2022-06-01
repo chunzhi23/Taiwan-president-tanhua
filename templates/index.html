@@ -15,8 +15,8 @@
         <ol id="gridCards"></ol>
     </div>
     <script>
-        let articleData;
         async function getArticles(){
+            let articleData;
             await fetch("/api/articles")
             .then(response => response.json())
             .then(data => {
