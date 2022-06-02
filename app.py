@@ -1,4 +1,3 @@
-import re
 import json, requests
 import natsort
 import subprocess
@@ -64,34 +63,43 @@ def get_zhko_word():
     query = request.args.get('query')
     query_simplified = ccvt.to_simplified(query)
     
-    url = 'https://zh.dict.naver.com/api3/zhko/search?query=%s' % query_simplified
+    url = 'https://zh.dict.naver.com/api3/zhko/search?query=%s'
+    header = {'user-agent': 'Chrome/101.0.4951.67'}
 
-    req = requests.get(url, headers={'user-agent': 'Chrome/101.0.4951.67'})
+    req = requests.get(url % query_simplified, headers=header)
     data = json.loads(req.text)
-    focus_data = data['searchResultMap']['searchResultListMap']['WORD']['items'][0]
-
-    ret_source = focus_data['sourceDictnameKO']
+    items = data['searchResultMap']['searchResultListMap']['WORD']['items']
     
-    ret_means = list()
-    for mean in focus_data['meansCollector']:
-        word_speech = mean['partOfSpeech']
-        
-        val_list = list()
-        for core in mean['means']:
-            sub_val = core['value']
-            val_list.append(sub_val)
-        
-        word_mean = dict({
-            'speech': word_speech,
-            'value': val_list})
-        
-        ret_means.append(word_mean)
-    
-    ret_flag = dict({
-        'source': ret_source,
-        'data': ret_means})
+    ret_data = list()
+    for item in items:
+        if item['handleEntry'] in query_simplified:
+            query_simplified = query_simplified.replace(item['handleEntry'], '')
+            
+            word = item['handleEntry']
+            source = item['sourceDictnameKO']
+            
+            all_word_speech = list()
+            for description in item['meansCollector']:
+                speech = description['partOfSpeech']
+                val_list = list()
+                for mean in description['means']:
+                    value = mean['value']
+                    val_list.append(value)
+                
+                each_speech_about = dict({
+                    'speech': speech,
+                    'data': val_list})
+                
+                all_word_speech.append(each_speech_about)
+            
+            word_dict = dict({
+                'word': word,
+                'source': source,
+                'meaning': all_word_speech})
 
-    return json.dumps(ret_flag, ensure_ascii=False)
+            ret_data.append(word_dict)
+
+    return ccvt.to_traditional(json.dumps(ret_data, ensure_ascii=False))
 
 if __name__ == '__main__':
     app.run(debug=True)
