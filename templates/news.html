@@ -82,8 +82,9 @@
                         }
                         targetElem.classList.add("active");
                         activeElem = targetElem;
+                        spanPopWindow(activeElem);
                     }
-                } else {
+                } else if (activeElem !== null){
                     activeElem.classList.remove("active");
                     activeElem = null;
                 }
