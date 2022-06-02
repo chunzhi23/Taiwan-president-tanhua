@@ -77,6 +77,7 @@ def get_zhko_word():
             
             word = item['handleEntry']
             source = item['sourceDictnameKO']
+            pinyin = item['symbolValue']
             
             all_word_speech = list()
             for description in item['meansCollector']:
@@ -95,6 +96,7 @@ def get_zhko_word():
             word_dict = dict({
                 'word': word,
                 'source': source,
+                'pinyin': pinyin,
                 'meaning': all_word_speech})
 
             ret_data.append(word_dict)
