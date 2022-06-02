@@ -98,6 +98,8 @@ def get_zhko_word():
                 'meaning': all_word_speech})
 
             ret_data.append(word_dict)
+        elif query_simplified == '':
+            break
 
     return ccvt.to_traditional(json.dumps(ret_data, ensure_ascii=False))
 
