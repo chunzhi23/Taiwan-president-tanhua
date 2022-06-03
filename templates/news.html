@@ -27,9 +27,27 @@
     #wrap {
         margin-left: 50px;
         margin-top: 30px;
+        margin-bottom: 120px;
     }
     #container {width: 800px;}
     
+    #layer_translated {
+        border-top: 1px solid black;
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        max-height: 100px;
+        background-color: white;
+        overflow-y: scroll;
+        display: none;
+        z-index: 100;
+    }
+    #layer_translated > p {
+        padding: 0 20px;
+        line-height: 24px;
+    }
+
     #tooltiplayer {
         border: 1px solid black;
         border-radius: 5px;
@@ -58,11 +76,22 @@
         display: block;
         font-size: 13px;
     }
+
+    .arrow_down {
+        margin-right: 10px;
+        border: solid black;
+        border-width: 0 3px 3px 0;
+        display: inline-block;
+        padding: 3px;
+        transform: rotate(45deg);
+        -webkit-transform: rotate(45deg);
+    }
 </style>
 <body>
     <div id="wrap">
         <h2>{{ title }}</h2>
         <div id="container"></div>
+        <div id="layer_translated"></div>
     </div>
     <div id="tooltiplayer"></div>
     <script>
@@ -130,6 +159,44 @@
                     tooltiplayer.style.display = "none";
                     activeElem.classList.remove("active");
                     activeElem = null;
+                }
+            });
+
+            let drag = false;
+            let layer_translated = document.getElementById("layer_translated");
+
+            document.addEventListener("mousedown", () => drag = false);
+            document.addEventListener("mousemove", () => drag = true);
+            document.addEventListener("mouseup", (evt) => {
+                if (drag){
+                    let selectedObj = window.getSelection();
+                    let selectedTxt = selectedObj.getRangeAt(0).toString();
+                    if (selectedTxt != ""){
+                        fetch("/api/zhko/translate", {
+                            method: "POST",
+                            body: JSON.stringify({
+                                "target": "ko",
+                                "text": selectedTxt
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            layer_translated.innerHTML = ''
+
+                            let p = document.createElement("p");
+                            let i = document.createElement("i");
+                            i.classList.add("arrow_down");
+                            i.addEventListener("click", () => layer_translated.style.display = "none");
+                            p.appendChild(i);
+                            
+                            let text = document.createTextNode(data['text']);
+                            p.appendChild(text);
+                            layer_translated.appendChild(p);
+                            
+                            layer_translated.classList.add("active");
+                            layer_translated.style.display = "block";
+                        });
+                    }
                 }
             });
         } setSpanEvent();

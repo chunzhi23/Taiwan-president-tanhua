@@ -107,5 +107,34 @@ def get_zhko_word():
 
     return ccvt.to_traditional(json.dumps(ret_data, ensure_ascii=False))
 
+@app.route('/api/zhko/translate', methods=['POST'])
+def get_zhko_translate():
+    if request.method == 'POST':
+        post_data = json.loads(request.data)
+        f = open('data/naver_api_key.json')
+        api_dict = json.load(f)
+        
+        url = 'https://openapi.naver.com/v1/papago/n2mt'
+        headers = {
+            'X-Naver-Client-Id': api_dict['CLIENT_ID'],
+            'X-Naver-Client-Secret': api_dict['CLIENT_SECRET']
+        }
+        payload = {
+            'source': 'zh-TW',
+            'target': post_data['target'],
+            'text': post_data['text']
+        }
+        req = requests.post(url, headers=headers, data=payload)
+        data = json.loads(req.text)
+        translated = data['message']['result']
+
+        ret_data = dict({
+            'source': translated['srcLangType'],
+            'target': translated['tarLangType'],
+            'text': translated['translatedText']
+        })
+
+    return json.dumps(ret_data)
+
 if __name__ == '__main__':
     app.run(debug=True)
