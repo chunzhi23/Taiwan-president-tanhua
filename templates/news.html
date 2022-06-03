@@ -8,26 +8,70 @@
 </head>
 <style>
     b {font-size: 18px;}
-    span:hover {
+    ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    dd {
+        margin: 0;
+        padding: 0;
+    }
+    span.hv_word_dict:hover {
         transition-delay: .2s;
         transition-property: background-color;
         background-color: rgba(0, 255, 0, 0.5);
     }
-    span.active {
-        background-color: rgba(0, 255, 0, 0.5);
-    }
+    span.active {background-color: rgba(0, 255, 0, 0.5);}
 
     #wrap {
         margin-left: 50px;
         margin-top: 30px;
     }
     #container {width: 800px;}
+    
+    #tooltiplayer {
+        border: 1px solid black;
+        border-radius: 5px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 300px;
+        background-color: white;
+        display: none;
+    }
+    #tooltiplayer dl.content {padding: 3px 12px;}
+    #tooltiplayer dl.content dt.word {font-size: 20px;}
+    #tooltiplayer dl.content dd.pronunciation {
+        margin-top: 2px;
+        font-size: 14px;
+    }
+    #tooltiplayer dl.content dd.definition {margin-top: 10px;}
+    #tooltiplayer dl.content dd.definition > ul {
+        font-size: 15px;
+    }
+    #tooltiplayer dl.content dd.definition > span {
+        margin-top: 6px;
+        display: block;
+        font-size: 13px;
+    }
+
+    #tooltiplayer .query {
+        margin-bottom: 12px;
+        padding-top: 10px;
+        padding-left: 12px;
+        padding-right: 12px;
+        border-top: 1px solid rgba(232, 232, 232, 0.5);
+        font-size: 13px;
+        text-align: right;
+    }
 </style>
 <body>
     <div id="wrap">
         <h2>{{ title }}</h2>
         <div id="container"></div>
     </div>
+    <div id="tooltiplayer"></div>
     <script>
         async function getDetails(){
             let detailData;
@@ -65,6 +109,7 @@
                     parentNode.appendChild(newText);
                 } else {
                     let newSpan = document.createElement("span");
+                    newSpan.classList.add("hv_word_dict");
                     newSpan.innerHTML = dataSplit[i];
                     parentNode.appendChild(newSpan);
                 }
@@ -73,23 +118,108 @@
 
         function setSpanEvent(){
             let activeElem = null;
+            let tooltiplayer = document.getElementById("tooltiplayer");
             document.addEventListener("click", (evt) => {
                 let targetElem = evt.target;
                 if (targetElem instanceof HTMLSpanElement){
-                    if (activeElem !== targetElem){
-                        if (activeElem !== null){
-                            activeElem.classList.remove("active");
+                    if (targetElem.classList.contains("hv_word_dict")){
+                        if (activeElem !== targetElem){
+                            if (activeElem !== null){
+                                activeElem.classList.remove("active");
+                            }
+                            targetElem.classList.add("active");
+                            activeElem = targetElem;
+                            spanPopWindow(activeElem);
                         }
-                        targetElem.classList.add("active");
-                        activeElem = targetElem;
-                        spanPopWindow(activeElem);
                     }
                 } else if (activeElem !== null){
+                    tooltiplayer.style.display = "none";
                     activeElem.classList.remove("active");
                     activeElem = null;
                 }
             });
         } setSpanEvent();
+
+        async function spanPopWindow(elem){
+            const word = elem.innerHTML;
+            let tooltiplayer = document.getElementById("tooltiplayer");
+            tooltiplayer.innerHTML = "";
+
+            await fetch(`/api/zhko/word?query=${word}`)
+            .then(response => response.json())
+            .then(data => {
+                for (let i = 0; i < data.length; i++){
+                    let dl = document.createElement("dl");
+                    dl.classList.add("content");
+
+                    let dt = document.createElement("dt");
+                    dt.classList.add("word");
+
+                    let b = document.createElement("b");
+                    b.innerHTML = data[i]["word"];
+                    dt.appendChild(b);
+                    dl.appendChild(dt);
+
+                    var dd = document.createElement("dd");
+                    dd.classList.add("pronunciation");
+
+                    for (let j = 0; j < data[i]["pinyin"].length; j++){
+                        var span = document.createElement("span");
+                        span.innerHTML = `[${data[i]["pinyin"][j]}]`;
+                        dd.appendChild(span);
+                    }
+                    dl.appendChild(dd);
+                    
+                    var dd = document.createElement("dd");
+                    dd.classList.add("definition");
+
+                    let ul = document.createElement("ul");
+                    ul.classList.add("meaning");
+                    
+                    for (let j = 0; j < data[i]["meaning"].length; j++){
+                        let foc = data[i]["meaning"][j]["data"];
+                        var li = document.createElement("li");
+                        for (let k = 0; k < foc.length; k++){
+                            var span = document.createElement("span");
+                            span.innerHTML = foc[k];
+                            li.appendChild(span);
+                        }
+                        ul.appendChild(li);
+                    }
+                    dd.appendChild(ul);
+
+                    var span = document.createElement("span");
+                    span.classList.add("source");
+                    span.innerHTML = `출처: ${data[i]["source"]}`;
+                    dd.appendChild(span);
+                    dl.appendChild(dd);
+                    tooltiplayer.appendChild(dl);
+                }
+
+                let div = document.createElement("div");
+                div.classList.add("query");
+
+                let a = document.createElement("a");
+                a.innerHTML = "전체 검색 결과 보기";
+                div.appendChild(a);
+                tooltiplayer.appendChild(div);
+            });
+            
+            let pos_top = getCoordinates(elem).top;
+            let pos_left = getCoordinates(elem).left;
+
+            tooltiplayer.style.top = (pos_top + 20) +"px";
+            tooltiplayer.style.left = pos_left +"px";
+            tooltiplayer.style.display = "block";
+        }
+
+        function getCoordinates(elem){
+            const rect = elem.getBoundingClientRect();
+            return {
+                left: rect.left + window.scrollX,
+                top: rect.top + window.scrollY
+            };
+        }
     </script>
 </body>
 </html>
