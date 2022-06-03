@@ -40,6 +40,9 @@
         background-color: white;
         display: none;
     }
+    #tooltiplayer dl.content > span {
+        font-size: 13px;
+    }
     #tooltiplayer dl.content {padding: 3px 12px;}
     #tooltiplayer dl.content dt.word {font-size: 20px;}
     #tooltiplayer dl.content dd.pronunciation {
@@ -54,16 +57,6 @@
         margin-top: 6px;
         display: block;
         font-size: 13px;
-    }
-
-    #tooltiplayer .query {
-        margin-bottom: 12px;
-        padding-top: 10px;
-        padding-left: 12px;
-        padding-right: 12px;
-        border-top: 1px solid rgba(232, 232, 232, 0.5);
-        font-size: 13px;
-        text-align: right;
     }
 </style>
 <body>
@@ -126,6 +119,7 @@
                         if (activeElem !== targetElem){
                             if (activeElem !== null){
                                 activeElem.classList.remove("active");
+                                tooltiplayer.style.display = "none";
                             }
                             targetElem.classList.add("active");
                             activeElem = targetElem;
@@ -148,61 +142,69 @@
             await fetch(`/api/zhko/word?query=${word}`)
             .then(response => response.json())
             .then(data => {
-                for (let i = 0; i < data.length; i++){
+                if (data.length === 0){
                     let dl = document.createElement("dl");
                     dl.classList.add("content");
 
-                    let dt = document.createElement("dt");
-                    dt.classList.add("word");
-
-                    let b = document.createElement("b");
-                    b.innerHTML = data[i]["word"];
-                    dt.appendChild(b);
-                    dl.appendChild(dt);
-
-                    var dd = document.createElement("dd");
-                    dd.classList.add("pronunciation");
-
-                    for (let j = 0; j < data[i]["pinyin"].length; j++){
-                        var span = document.createElement("span");
-                        span.innerHTML = `[${data[i]["pinyin"][j]}]`;
-                        dd.appendChild(span);
-                    }
-                    dl.appendChild(dd);
-                    
-                    var dd = document.createElement("dd");
-                    dd.classList.add("definition");
-
-                    let ul = document.createElement("ul");
-                    ul.classList.add("meaning");
-                    
-                    for (let j = 0; j < data[i]["meaning"].length; j++){
-                        let foc = data[i]["meaning"][j]["data"];
-                        var li = document.createElement("li");
-                        for (let k = 0; k < foc.length; k++){
-                            var span = document.createElement("span");
-                            span.innerHTML = foc[k];
-                            li.appendChild(span);
-                        }
-                        ul.appendChild(li);
-                    }
-                    dd.appendChild(ul);
-
-                    var span = document.createElement("span");
-                    span.classList.add("source");
-                    span.innerHTML = `출처: ${data[i]["source"]}`;
-                    dd.appendChild(span);
-                    dl.appendChild(dd);
+                    let span = document.createElement("span");
+                    span.innerHTML = "검색 결과가 없습니다.";
+                    dl.appendChild(span);
                     tooltiplayer.appendChild(dl);
                 }
+                else {
+                    for (let i = 0; i < data.length; i++){
+                        let dl = document.createElement("dl");
+                        dl.classList.add("content");
 
-                let div = document.createElement("div");
-                div.classList.add("query");
+                        let dt = document.createElement("dt");
+                        dt.classList.add("word");
 
-                let a = document.createElement("a");
-                a.innerHTML = "전체 검색 결과 보기";
-                div.appendChild(a);
-                tooltiplayer.appendChild(div);
+                        let b = document.createElement("b");
+                        b.innerHTML = data[i]["word"];
+                        dt.appendChild(b);
+                        dl.appendChild(dt);
+
+                        var dd = document.createElement("dd");
+                        dd.classList.add("pronunciation");
+
+                        for (let j = 0; j < data[i]["pinyin"].length; j++){
+                            var span = document.createElement("span");
+                            span.innerHTML = `[${data[i]["pinyin"][j]}]`;
+                            dd.appendChild(span);
+                        }
+                        dl.appendChild(dd);
+                        
+                        var dd = document.createElement("dd");
+                        dd.classList.add("definition");
+
+                        let ul = document.createElement("ul");
+                        ul.classList.add("meaning");
+                        
+                        for (let j = 0; j < data[i]["meaning"].length; j++){
+                            let foc = data[i]["meaning"][j]["data"];
+                            var li = document.createElement("li");
+                            for (let k = 0; k < foc.length; k++){
+                                var span = document.createElement("span");
+                                span.innerHTML = foc[k];
+                                
+                                while (span.children.length != 0){
+                                    let elem = span.children[0]
+                                    elem.outerHTML = elem.innerHTML;
+                                }
+                                li.appendChild(span);
+                            }
+                            ul.appendChild(li);
+                        }
+                        dd.appendChild(ul);
+
+                        var span = document.createElement("span");
+                        span.classList.add("source");
+                        span.innerHTML = `출처: ${data[i]["source"]}`;
+                        dd.appendChild(span);
+                        dl.appendChild(dd);
+                        tooltiplayer.appendChild(dl);
+                    }
+                }
             });
             
             let pos_top = getCoordinates(elem).top;
