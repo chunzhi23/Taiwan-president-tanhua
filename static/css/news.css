@@ -1,0 +1,79 @@
+b {font-size: 18px;}
+ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+dd {
+    margin: 0;
+    padding: 0;
+}
+span.hv_word_dict:hover {
+    transition-delay: .2s;
+    transition-property: background-color;
+    background-color: rgba(0, 255, 0, 0.5);
+}
+span.active {background-color: rgba(0, 255, 0, 0.5);}
+
+#wrap {
+    margin-left: 50px;
+    margin-top: 30px;
+    margin-bottom: 120px;
+}
+#container {width: 800px;}
+
+#layer_translated {
+    border-top: 1px solid black;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    max-height: 100px;
+    background-color: white;
+    overflow-y: scroll;
+    display: none;
+    z-index: 100;
+}
+#layer_translated > p {
+    padding: 0 20px;
+    line-height: 24px;
+}
+
+#tooltiplayer {
+    border: 1px solid black;
+    border-radius: 5px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 300px;
+    background-color: white;
+    display: none;
+}
+#tooltiplayer dl.content > span {
+    font-size: 13px;
+}
+#tooltiplayer dl.content {padding: 3px 12px;}
+#tooltiplayer dl.content dt.word {font-size: 20px;}
+#tooltiplayer dl.content dd.pronunciation {
+    margin-top: 2px;
+    font-size: 14px;
+}
+#tooltiplayer dl.content dd.definition {margin-top: 10px;}
+#tooltiplayer dl.content dd.definition > ul {
+    font-size: 15px;
+}
+#tooltiplayer dl.content dd.definition > span {
+    margin-top: 6px;
+    display: block;
+    font-size: 13px;
+}
+
+.arrow_down {
+    margin-right: 10px;
+    border: solid black;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+}

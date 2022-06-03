@@ -5,7 +5,7 @@ import jieba
 import chinese_converter as ccvt
 import pandas as pd
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, url_for, request
 from bs4 import BeautifulSoup
 
 app = Flask(__name__)

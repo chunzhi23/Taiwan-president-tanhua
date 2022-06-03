@@ -14,25 +14,6 @@
         <h2>台灣國總統談話</h2>
         <ol id="gridCards"></ol>
     </div>
-    <script>
-        async function getArticles(){
-            let articleData;
-            await fetch("/api/articles")
-            .then(response => response.json())
-            .then(data => {
-                articleData = data;
-            });
-            
-            const olWrap = document.querySelector("#wrap > ol");
-            for (let i = 0; i < articleData.length; i++){
-                let newLi = document.createElement("li");
-                let newA = document.createElement("a");
-                newA.innerText = articleData[i]["title"];
-                newA.href = articleData[i]["url"];
-                newLi.appendChild(newA);
-                olWrap.appendChild(newLi);
-            }
-        } getArticles();
-    </script>
+    <script src="{{ url_for('static', filename='js/getArticles.js') }}"></script>
 </body>
 </html>
