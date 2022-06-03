@@ -75,34 +75,55 @@ function setSpanEvent(){
             let selectedObj = window.getSelection();
             let selectedTxt = selectedObj.getRangeAt(0).toString();
             if (selectedTxt != ""){
-                fetch("/api/zhko/translate", {
-                    method: "POST",
-                    body: JSON.stringify({
-                        "target": "ko",
-                        "text": selectedTxt
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    layer_translated.innerHTML = ''
+                layer_translated.innerHTML = ''
 
-                    let p = document.createElement("p");
-                    let i = document.createElement("i");
-                    i.classList.add("arrow_down");
-                    i.addEventListener("click", () => layer_translated.style.display = "none");
-                    p.appendChild(i);
-                    
-                    let text = document.createTextNode(data['text']);
-                    p.appendChild(text);
-                    layer_translated.appendChild(p);
-                    
-                    layer_translated.classList.add("active");
-                    layer_translated.style.display = "block";
+                let p = document.createElement("p");
+                let i = document.createElement("i");
+                i.classList.add("arrow_down");
+                i.addEventListener("click", () => {
+                    layer_translated.style.display = "none";
+                    layer_translated.classList.remove("active");
                 });
+                p.appendChild(i);
+
+                let button = document.createElement("button");
+                button.addEventListener("click", () => translateTxt(selectedTxt));
+                button.innerHTML = "Papago 번역";
+                p.appendChild(button);
+                
+                layer_translated.appendChild(p);
+                
+                layer_translated.classList.add("active");
+                layer_translated.style.display = "block";
             }
         }
     });
 } setSpanEvent();
+
+function translateTxt(text){
+    fetch("/api/zhko/translate", {
+        method: "POST",
+        body: JSON.stringify({
+            "target": "ko",
+            "text": text
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        let layer_translated = document.getElementById("layer_translated");
+        layer_translated.innerHTML = '';
+
+        let p = document.createElement("p");
+        let i = document.createElement("i");
+        i.classList.add("arrow_down");
+        i.addEventListener("click", () => layer_translated.style.display = "none");
+        p.appendChild(i);
+        
+        let text = document.createTextNode(data['text']);
+        p.appendChild(text);
+        layer_translated.appendChild(p);
+    });
+}
 
 async function spanPopWindow(elem){
     const word = elem.innerHTML;
